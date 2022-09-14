@@ -1,5 +1,5 @@
 import {Component} from 'react'
-import HistoryEl from './Components/History/HistoryEl'
+import HistoryEl from './Components/History/history'
 import './App.css'
 
 // These are the list used in the application. You can move them to any component needed.
@@ -80,7 +80,44 @@ const initialHistoryList = [
 
 // Replace your code here
 class App extends Component {
+  state = {searchText: '', historyList: initialHistoryList}
+
+  onChangeText = event => {
+    console.log(event.target.value)
+    this.setState({searchText: event.target.value})
+  }
+
+  deleteItem = id => {
+    const {historyList} = this.state
+    const filterData = historyList.filter(each => each.id !== id)
+    this.setState({historyList: filterData})
+  }
+
   render() {
+    const {searchText, historyList} = this.state
+    const searchList = historyList.filter(each =>
+      each.title.toLowerCase().includes(searchText.toLowerCase()),
+    )
+    const listLength = historyList.length
+    let text
+    if (listLength === 0) {
+      text = <p className="nothing-para">There is no history to show</p>
+    } else {
+      text = searchList.map(each => (
+        <HistoryEl
+          key={each.id}
+          deleteItem={this.deleteItem}
+          historyDetails={each}
+        />
+      ))
+    }
+
+    /*
+    const text = searchList.map(each => (
+      <HistoryEl deleteItem={this.deleteItem} historyDetails={each} />
+    ))
+    */
+
     return (
       <div className="bg-container">
         <div className="nav-bar">
@@ -101,14 +138,13 @@ class App extends Component {
               type="search"
               placeholder="Search history"
               className="input-el"
+              onChange={this.onChangeText}
             />
           </div>
         </div>
 
         <div className="item-container">
-          <ul className="list-container">
-            <HistoryEl historyDetails={initialHistoryList[0]} />
-          </ul>
+          <ul className="list-container">{text}</ul>
         </div>
       </div>
     )
@@ -116,3 +152,6 @@ class App extends Component {
 }
 
 export default App
+
+// There is no history to show
+// There is no history to show
